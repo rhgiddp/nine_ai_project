@@ -1,0 +1,35 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.cache/
+
+# Virtual environments
+.venv-yanolja/
+.venv*/
+venv/
+env/
+
+# Environment variables / secrets
+.env
+.env.*
+
+# IDE / Editor
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Logs
+*.log
+
+# Selenium temporary Chrome profiles
+yanolja_chrome_profile_*/
+

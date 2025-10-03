@@ -1,0 +1,9 @@
+openai
+huggingface-hub
+numpy
+pandas
+tqdm
+datasets
+python-dotenv==1.0.1
+
+
