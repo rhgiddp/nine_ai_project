@@ -1,15 +1,17 @@
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
 import numpy as np
 from openai import OpenAI
 
 
-# .env 로드 후 키 읽기
-load_dotenv()
+# env.txt 로드 후 키 읽기
+env_path = Path(__file__).parent / "env.txt"
+load_dotenv(env_path, override=True)
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 if not OPENAI_API_KEY:
-    raise RuntimeError('환경변수 OPENAI_API_KEY가 없습니다. 프로젝트 폴더의 .env 또는 쉘에 설정하세요.')
+    raise RuntimeError('환경변수 OPENAI_API_KEY가 없습니다. 프로젝트 폴더의 env.txt 또는 쉘에 설정하세요.')
 
 
 def get_embedding(text, model='text-embedding-3-small'):

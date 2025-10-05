@@ -1,8 +1,14 @@
 import os
+from pathlib import Path
+from dotenv import load_dotenv
 
 import numpy as np
 from openai import OpenAI
 
+
+# env.txt 로드
+env_path = Path(__file__).parent / "env.txt"
+load_dotenv(env_path, override=True)
 
 KEYWORDS_BLACKLIST = ['리뷰', 'zㅣ쀼', 'ZI쀼', 'Zl쀼', '리쀼', '찜', '이벤트', '추가', '소스']
 KEYWORDS_CONTEXT = [

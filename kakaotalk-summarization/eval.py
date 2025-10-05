@@ -1,10 +1,16 @@
 import os
+from pathlib import Path
 import pickle
 
+from dotenv import load_dotenv
 from openai import OpenAI
 
 
-OPENAI_API_KEY = os.environ['OPENAI_API_KEY']
+# env.txt 로드
+env_path = Path(__file__).parent / "env.txt"
+load_dotenv(env_path, override=True)
+
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
 
 def get_eval_data():

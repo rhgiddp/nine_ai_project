@@ -1,13 +1,20 @@
 import json
 import os
+from pathlib import Path
 import requests
 import sys
 sys.path.insert(0, "..")
 
 import gradio as gr
+from dotenv import load_dotenv
 from openai import OpenAI
 
 from utils import call_openai
+
+
+# env.txt 로드
+env_path = Path(__file__).parent.parent / "env.txt"
+load_dotenv(env_path, override=True)
 
 
 SYSTEM_PROMPT = f"""당신의 이름은 '메뉴뚝딱AI'이며 당신의 역할은 배달의민족이라는 음식 주문 모바일 어플에서 리뷰 텍스트 기반으로 메뉴를 추천해주는 것입니다.
@@ -54,7 +61,7 @@ def recommend(query_text):
 
 
 def call_openai(prompt, temperature=0.0, model='gpt-4o-2024-08-06'):
-    client = OpenAI(api_key=os.environ['OPENAI_API_KEY'])
+    client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
     MESSAGES.append(
         {

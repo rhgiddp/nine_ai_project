@@ -1,16 +1,22 @@
 import os
+from pathlib import Path
 import pickle
 import time
 
 import anthropic
+from dotenv import load_dotenv
 import google.generativeai as genai
 from google.generativeai.types import HarmCategory, HarmBlockThreshold
 from openai import OpenAI
 
 
-ANTHROPIC_API_KEY = os.environ['ANTHROPIC_API_KEY']
-GOOGLE_API_KEY = os.environ['GOOGLE_API_KEY']
-OPENAI_API_KEY = os.environ['OPENAI_API_KEY']
+# env.txt 로드
+env_path = Path(__file__).parent / "env.txt"
+load_dotenv(env_path, override=True)
+
+ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY')
+GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 MAX_LEN = 3000
 
 

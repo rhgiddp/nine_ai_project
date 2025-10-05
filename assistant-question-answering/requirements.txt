@@ -6,4 +6,8 @@ google-auth-oauthlib==1.2.1
 slack-bolt==1.19.1
 slack==0.0.2
 slackclient==2.9.4
-numpy==2.0.1
+numpy==2.0.1# PyTorch with CUDA support
+torch>=2.5.0
+torchvision>=0.20.0
+torchaudio>=2.5.0
+
