@@ -51,7 +51,8 @@ Q. 크롤링 이슈: 리뷰들의 별점이 전부 5점으로 나옵니다.
 - 해결 방법:
   - 최근 리뷰 별점을 웹사이트에 그리는 방식에 변화가 있었는데, 다음 커밋 참고해서 수정해주시면 정상 작동합니다. [commit](https://github.com/rein20/ai-service/commit/fb6ab0fe5c8ef9f794e423b1497d70a755cf76cf)
 
-# 라이브러리 설치 방법
+
+# KUS 가 말하는 라이브러리 설치 방법
 cd "D:/FAST_CAMF/Nine_Project"
 커서를 프로젝트 루트로 이동 → 아래 블록을 “그대로” 붙여넣고 Enter
 
@@ -71,8 +72,10 @@ setup yanolja-summarization          yanolja
 
 ## 활성화 예시(작업할 때)
 source yanolja-summarization/.venv-yanolja/Scripts/activate
+
 ### 작업 끝나면
 deactivate
+
 ### 커서에서 직접 활성화 
 Ctrl+Shift+P → “Python: Select Interpreter” -> 
 “Enter interpreter path…” 선택 → 경로 직접 입력/아니면 선택

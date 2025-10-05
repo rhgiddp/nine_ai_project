@@ -14,6 +14,7 @@ env/
 # Environment variables / secrets
 .env
 .env.*
+env.txt
 
 # IDE / Editor
 .vscode/
@@ -33,4 +34,6 @@ Thumbs.db
 yanolja_chrome_profile_*/
 
 res/train-sample.jsonl
+
+
 
