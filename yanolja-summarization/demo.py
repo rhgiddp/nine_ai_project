@@ -1,19 +1,13 @@
 import datetime
 import json
-import os
 import pickle
 from dateutil import parser
 
 import gradio as gr
-from openai import OpenAI
-from dotenv import load_dotenv
+from utils import get_openai_client
 
-
-# .env 로드 후 키 읽기
-load_dotenv()
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-if not OPENAI_API_KEY:
-    raise RuntimeError('환경변수 OPENAI_API_KEY가 없습니다. 프로젝트 루트의 .env 또는 쉘에 설정하세요.')
+# OpenAI 클라이언트 생성 (env.txt에서 API 키 자동 로드)
+client = get_openai_client()
 MAPPING = {
     '인사동': './res/reviews.json',
     '판교': './res/ninetree_pangyo.json',
@@ -68,7 +62,6 @@ def summarize(reviews):
     """OpenAI Chat Completions로 요약을 생성합니다."""
     prompt = PROMPT + '\n\n' + reviews
 
-    client = OpenAI(api_key=OPENAI_API_KEY)
     completion = client.chat.completions.create(
         model='gpt-3.5-turbo-0125',
         messages=[{'role': 'user', 'content': prompt}],
