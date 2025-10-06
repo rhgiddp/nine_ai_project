@@ -3,7 +3,7 @@ from pathlib import Path
 from openai import OpenAI
 
 
-def load_api_key(env_file_name='env.txt'):
+def load_opapi_key(env_file_name='env.txt'):
     """
     env.txt 파일에서 OPENAI_API_KEY를 로드합니다.
     
@@ -48,6 +48,6 @@ def get_openai_client(env_file_name='env.txt'):
     Returns:
         OpenAI: OpenAI 클라이언트 객체
     """
-    api_key = load_api_key(env_file_name)
+    api_key = load_opapi_key(env_file_name)
     return OpenAI(api_key=api_key)
 

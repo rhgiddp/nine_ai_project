@@ -1,9 +1,10 @@
-openai
+openai==1.70.0
 huggingface-hub
-numpy
+numpy<2.0
 pandas
 tqdm
 datasets
+ragas
 python-dotenv==1.0.1
 
 

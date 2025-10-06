@@ -52,38 +52,84 @@ Q. 크롤링 이슈: 리뷰들의 별점이 전부 5점으로 나옵니다.
   - 최근 리뷰 별점을 웹사이트에 그리는 방식에 변화가 있었는데, 다음 커밋 참고해서 수정해주시면 정상 작동합니다. [commit](https://github.com/rein20/ai-service/commit/fb6ab0fe5c8ef9f794e423b1497d70a755cf76cf)
 
 
-# KUS 가 말하는 라이브러리 설치 방법
-cd "D:/FAST_CAMF/Nine_Project"
-커서를 프로젝트 루트로 이동 → 아래 블록을 “그대로” 붙여넣고 Enter
+# KUS 가 말하는 라이브러리 설치 방법 
 
-setup() {
+## 1. 환경 생성 (CPU/GPU 선택, 루트/bash에서)
+
+### CPU 환경 생성
+
+setup_cpu() {
   proj="$1"; vname="$2"
-  python -m venv "$proj/.venv-$vname"
-  source "$proj/.venv-$vname/Scripts/activate"
-  python -m pip install -r "$proj/requirements.txt"
-  deactivate
+  cd "$proj"
+  conda create -p ".conda-$vname" python=3.12 -y
+  conda activate ".conda-$vname"
+  pip install ipykernel
+  pip install -r "requirements.txt"
+  python -m ipykernel install --user --name "conda-$vname" --display-name "Python (\"conda-$vname\")"
+  conda deactivate
+  cd ..
 }
 
-setup assistant-question-answering   aaq
-setup baemin-recommendation          baemin
-setup kakaotalk-summarization        kakao
-setup retrieval-augmented-generation rag
-setup yanolja-summarization          yanolja
+setup_cpu assistant-question-answering   aaq
+setup_cpu baemin-recommendation          baemin
+setup_cpu kakaotalk-summarization        kakao
+setup_cpu prompt-engineering             prompt
+setup_cpu retrieval-augmented-generation rag
+setup_cpu yanolja-summarization          yanolja
+```
 
-## 활성화 예시(작업할 때)
-source yanolja-summarization/.venv-yanolja/Scripts/activate
+### GPU 환경 생성
 
-### 작업 끝나면
-deactivate
+setup_gpu() {
+  proj="$1"; vname="$2"
+  cd "$proj"
+  conda create -p ".conda-$vname-GPU" python=3.12 -y
+  conda activate ".conda-$vname-GPU"
+  
+  # 플랫폼별 GPU PyTorch 설치
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS (MPS 지원)
+    pip install torch torchvision torchaudio
+  else
+    # Windows/Linux (CUDA 지원)
+    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+  fi
+  
+  # 나머지 패키지 설치
+  pip install ipykernel
+  pip install -r "requirements.txt"
+  python -m ipykernel install --user --name "conda-$vname-GPU" --display-name "Python (conda-$vname-GPU)"
+  conda deactivate
+  cd ..
+}
 
-### 커서에서 직접 활성화 
-Ctrl+Shift+P → “Python: Select Interpreter” -> 
-“Enter interpreter path…” 선택 → 경로 직접 입력/아니면 선택
+setup_gpu assistant-question-answering   aaq
+setup_gpu baemin-recommendation          baemin
+setup_gpu kakaotalk-summarization        kakao
+setup_gpu prompt-engineering             prompt
+setup_gpu retrieval-augmented-generation rag
+setup_gpu yanolja-summarization          yanolja
+```
 
+### 환경 사용법
+```bash
+# 해당 프로젝트로 이동
+cd assistant-question-answering
 
-## 커맨드 팔레트로 인터프리터 지정(가장 간단)
-에디터(런 디버깅)도 각 워크스페이스/런 설정에서 해당 프로젝트의 venv 파이썬을 지정하면 병렬 실행이 수월합니다.
-병렬 실행시 각각 터미널을 따로 할당해 실행합니다.
+# CPU 환경 활성화
+conda activate ./.conda-aaq
 
-## requirements.txt 라이브러리 설치하기
-"D:\FAST_CAMF\Nine_Project\prompt-engineering"; .venv\Scripts\python.exe -m pip install -r requirements.txt
+# GPU 환경 활성화  
+conda activate ./.conda-aaq-GPU
+
+# 패키지 설치
+pip install package_name
+pip install -r requirements.txt
+
+# 작업 완료 후 비활성화
+conda deactivate
+```
+### 환경 사용법2
+파일들에서 import 에러가 난 것은 ctrl + shift + P 에서 인터프리터 선택에서 환경을 선택해야 함 
+가끔 껐다 켜야 적용될 때가 있다
+환경 활성 이후에 install 해야 해당 위치에 적용됨.

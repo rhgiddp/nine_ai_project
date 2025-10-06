@@ -1,10 +1,12 @@
-openai==1.41.1
-numpy==2.1.0
+openai==1.70.0
+numpy<2.0
 pymongo==4.8.0
 fastapi[standard]==0.112.1
 dnspython==2.6.1
-gradio==4.41.0# PyTorch with CUDA support
+gradio==4.41.0  # PyTorch with CUDA support
 torch>=2.5.0
 torchvision>=0.20.0
 torchaudio>=2.5.0
-
+certifi
+beautifulsoup4
+selenium

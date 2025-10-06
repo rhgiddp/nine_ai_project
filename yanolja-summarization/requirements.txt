@@ -1,13 +1,13 @@
 beautifulsoup4==4.12.3
 selenium==4.21.0
-openai>=1.54.0
+openai>=1.70.0
 tqdm
 gradio==4.32.0
+numpy<2.0
 python-dotenv==1.0.1
 python-dateutil==2.8.2
 pydub==0.25.1
-audioop-lts
-httpx>=0.27.0# PyTorch with CUDA support
+httpx>=0.27.0  # PyTorch with CUDA support
 torch>=2.5.0
 torchvision>=0.20.0
 torchaudio>=2.5.0

@@ -19,6 +19,42 @@ GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 MAX_LEN = 3000
 
+def load_api_key(env_file_name='env.txt'):
+    # 현재 파일의 디렉토리를 기준으로 env 파일 경로 설정
+    current_dir = Path(__file__).parent
+    env_file = current_dir / env_file_name
+    
+    # 파일 내용을 읽어서 환경변수 설정
+    if env_file.exists():
+        with open(env_file, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    key, value = line.split('=', 1)
+                    os.environ[key.strip()] = value.strip()
+    
+    # API 키 가져오기
+    api_key = os.environ.get('OPENAI_API_KEY')
+    
+    if not api_key:
+        raise ValueError("OPENAI_API_KEY를 찾을 수 없습니다. env.txt 파일을 확인해주세요.")
+    
+    return api_key
+
+
+def get_openai_client(env_file_name='env.txt'):
+    """
+    OpenAI 클라이언트를 생성하여 반환합니다.
+    
+    Args:
+        env_file_name (str): 환경변수 파일 이름 (기본값: 'env.txt')
+    
+    Returns:
+        OpenAI: OpenAI 클라이언트 객체
+    """
+    api_key = load_api_key(env_file_name)
+    return OpenAI(api_key=api_key)
+
 
 def shorten_conv(conversation):
     """대화가 너무 길면 뒤쪽만 남기도록 앞부분을 잘라 길이를 제한."""

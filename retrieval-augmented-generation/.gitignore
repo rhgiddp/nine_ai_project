@@ -35,5 +35,6 @@ yanolja_chrome_profile_*/
 
 res/train-sample.jsonl
 
-
+.conda-*
+.conda-*/*
 

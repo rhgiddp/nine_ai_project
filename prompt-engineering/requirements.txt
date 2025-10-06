@@ -1,10 +1,11 @@
-openai
+openai==1.104.02
 jupyter
 python-dotenv==1.0.1
+numpy<2.0
 
 
 # PyTorch with CUDA support
 torch>=2.5.0
 torchvision>=0.20.0
 torchaudio>=2.5.0
-
+userdata

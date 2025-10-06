@@ -34,3 +34,5 @@ Thumbs.db
 # Selenium temporary Chrome profiles
 yanolja_chrome_profile_*/
 
+.conda-*
+.conda-*/*
