@@ -4,10 +4,10 @@ import pickle
 from dateutil import parser
 
 import gradio as gr
-from utils import get_openai_client
 
-# OpenAI 클라이언트 생성 (env.txt에서 API 키 자동 로드)
-client = get_openai_client()
+from utils import get_openai_client
+OPEN_API_KEY, client = get_openai_client()
+
 MAPPING = {
     '인사동': './res/reviews.json',
     '판교': './res/ninetree_pangyo.json',

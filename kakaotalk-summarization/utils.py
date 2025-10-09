@@ -9,20 +9,25 @@ import google.generativeai as genai
 from google.generativeai.types import HarmCategory, HarmBlockThreshold
 from openai import OpenAI
 
-
-# env.txt 로드
-env_path = Path(__file__).parent / "env.txt"
-load_dotenv(env_path, override=True)
-
-ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY')
-GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 MAX_LEN = 3000
 
-def load_api_key(env_file_name='env.txt'):
+# API 키 캐시
+_api_keys_loaded = False
+_api_keys = {
+    'OPENAI_API_KEY': None,
+    'GOOGLE_API_KEY': None,
+    'ANTHROPIC_API_KEY': None
+}
+
+def _load_api_keys():
+    """API 키를 한 번만 로드하고 캐시합니다."""
+    global _api_keys_loaded
+    if _api_keys_loaded:
+        return  # 이미 로드됨
+    
     # 현재 파일의 디렉토리를 기준으로 env 파일 경로 설정
     current_dir = Path(__file__).parent
-    env_file = current_dir / env_file_name
+    env_file = current_dir / 'env.txt'
     
     # 파일 내용을 읽어서 환경변수 설정
     if env_file.exists():
@@ -34,26 +39,27 @@ def load_api_key(env_file_name='env.txt'):
                     os.environ[key.strip()] = value.strip()
     
     # API 키 가져오기
-    api_key = os.environ.get('OPENAI_API_KEY')
+    _api_keys['OPENAI_API_KEY'] = os.environ.get('OPENAI_API_KEY')
+    _api_keys['GOOGLE_API_KEY'] = os.environ.get('GOOGLE_API_KEY')
+    _api_keys['ANTHROPIC_API_KEY'] = os.environ.get('ANTHROPIC_API_KEY')
     
-    if not api_key:
-        raise ValueError("OPENAI_API_KEY를 찾을 수 없습니다. env.txt 파일을 확인해주세요.")
+    if not _api_keys['OPENAI_API_KEY'] and not _api_keys['GOOGLE_API_KEY'] and not _api_keys['ANTHROPIC_API_KEY']:
+        raise ValueError("API 키를 찾을 수 없습니다. OPENAI_API_KEY, GOOGLE_API_KEY, ANTHROPIC_API_KEY 중 최소 하나는 env.txt 파일에 설정되어야 합니다.")
     
-    return api_key
+    _api_keys_loaded = True
 
 
-def get_openai_client(env_file_name='env.txt'):
-    """
-    OpenAI 클라이언트를 생성하여 반환합니다.
-    
-    Args:
-        env_file_name (str): 환경변수 파일 이름 (기본값: 'env.txt')
-    
-    Returns:
-        OpenAI: OpenAI 클라이언트 객체
-    """
-    api_key = load_api_key(env_file_name)
-    return OpenAI(api_key=api_key)
+def get_openai_key():    
+    _load_api_keys()
+    return _api_keys['OPENAI_API_KEY']
+
+def get_googleai_key():    
+    _load_api_keys()
+    return _api_keys['GOOGLE_API_KEY']
+
+def get_anthropicai_key():    
+    _load_api_keys()
+    return _api_keys['ANTHROPIC_API_KEY']
 
 
 def shorten_conv(conversation):
@@ -84,7 +90,8 @@ def summarize(conversation, prompt, temperature=0.0, model='gpt-3.5-turbo-0125')
     prompt = prompt + '\n\n' + conversation
 
     if 'gpt' in model:
-        client = OpenAI(api_key=OPENAI_API_KEY)
+        openai_api_key = get_openai_key()
+        client = OpenAI(api_key=openai_api_key)
         completion = client.chat.completions.create(
             model=model,
             messages=[{'role': 'user', 'content': prompt}],
@@ -93,7 +100,8 @@ def summarize(conversation, prompt, temperature=0.0, model='gpt-3.5-turbo-0125')
 
         return completion.choices[0].message.content
     elif 'gemini' in model:
-        genai.configure(api_key=GOOGLE_API_KEY)
+        google_api_key = get_googleai_key()
+        genai.configure(api_key=google_api_key)
         client = genai.GenerativeModel(model)
         response = client.generate_content(
             contents=prompt,
@@ -105,7 +113,8 @@ def summarize(conversation, prompt, temperature=0.0, model='gpt-3.5-turbo-0125')
 
         return response.text
     elif 'claude' in model:
-        client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+        anthropic_api_key = get_anthropicai_key()
+        client = anthropic.Anthropic(api_key=anthropic_api_key)
         message = client.messages.create(
             model=model,
             messages=[{"role": "user", "content": prompt}],
@@ -126,7 +135,7 @@ def get_train_data():
 
 def get_prompt():
     """요약 지침 프롬프트를 구성하여 반환."""
-    conv_train = get_train_data()[18]
+    conv_train = get_train_data()[0]  # 첫 번째 데이터 사용
 
     prompt = f"""당신은 요약 전문가입니다. 사용자 대화들이 주어졌을 때 요약하는 것이 당신의 목표입니다. 대화를 요약할 때는 다음 단계를 따라주세요:
 
@@ -145,25 +154,19 @@ def get_prompt():
 {conv_train}
 
 예시 요약 과정
-1. "우리 대학교 졸업 여행 간 거 기억나?"라는 언급과 전반적으로 친밀한 대화 톤을 사용하고 있는 것을 보았을 떄 두 사용자는 오랜 친구 사이로 보입니다.
-대화의 시작 부분에서 "코로나가 좀 잠잠해지면 해외여행 중에 가고 싶은 곳 있어?"라고 묻고 있는 것을 보았을 때 코로나 이후 가고 싶은 해외 여행지에 대해 논의하고 있습니다.
-따라서 다음과 같이 요약 할 수 있습니다:
-최소 대학 생활부터 함께 한 매우 친밀한 사이의 두 사용자가 코로나가 잠잠해졌을 때 방문하고 싶은 해외 여행지에 대해 일상적이고 가벼운 톤으로 대화하고 있습니다.
+1. 대화 참여자 파악: P01과 P02 두 명이 친구 관계로 보이며, 서로를 "언니", "오빠"라고 부르는 것으로 보아 나이 차이가 있는 친구 사이입니다.
 
-2. 대화 중 호주, 일본, 하와이, 괌, 베트남 다낭, 스위스, 유럽들이 언급하고 있습니다.
-남편의 첫 직장 워크샵, 대학교 졸업 여행, 호주 워킹홀리데이 등의 경험을 이야기하면서 과거 여행 경험을 공유하며 추억을 회상하고 있습니다.
-따라서 다음과 같이 요약 할 수 있습니다:
-여행지로는 하와이, 괌, 스위스, 호주, 베트남 다낭 등을 언급하며 남편과의 연락 관련 다툼이나 졸업여행 관련 추억을 회상합니다.
+2. 주제 식별: 연애 경험과 남자친구에 대한 이야기가 주요 주제입니다. 구체적으로는 현재 남자친구의 나이, 과거 연애 경험, 연상/연하 연애에 대한 의견 등을 다루고 있습니다.
 
-3. 소매치기, 여권 분실, 인도에서의 여성 여행자 위험 등을 언급하며 해외 여행의 위험성에 대해 우려를 표현하고 있습니다.
-"해외 여행 가면 가이드 안 끼고 가면 영어 실력 엄청 좋은 사람이랑 가는 거 아닐 땐 소통 문제도 좀 곤란할 때가 있는 거 같아"라는 언급과 "왜 영어 공부를 열심히 안 했을까... 후회"라는 표현이 있는 것을 보았을 때 언어 장벽의 어려움을 인식하고 영어 실력 향상에 대한 욕구를 표현합니다.
-따라서 다음과 같이 요약 할 수 있습니다:
-또한 여행 중 발생하는 위험에 대한 우려도 표하고 있으며, 해외여행 시 언어 장벽의 어려움을 인식하고 영어 실력을 향상시키고 싶다는 마음을 가볍게 표현합니다.
+3. 핵심 내용 추출: P01은 주로 오빠(연상)와 사귀었고, P02는 동갑과 사귀고 있으며 1년째 사귀고 있습니다. 둘 다 연하 연애는 부담스러워하며 자상한 오빠를 선호합니다.
+
+4. 감정과 태도 분석: 가벼운 톤으로 친근하게 대화하며, 연애에 대한 솔직한 의견을 나누고 있습니다.
+
+따라서 다음과 같이 요약할 수 있습니다:
+두 친구가 연애 경험을 공유하며 현재 남자친구와의 관계, 과거 연애 스타일, 연상/연하 연애에 대한 선호도에 대해 가벼운 톤으로 대화하고 있습니다.
 
 예시 요약 결과
-최소 대학 생활부터 함께 한 매우 친밀한 사이의 두 사용자가 코로나가 잠잠해졌을 때 방문하고 싶은 해외 여행지에 대해 일상적이고 가벼운 톤으로 대화하고 있습니다.
-여행지로는 하와이, 괌, 스위스, 호주, 베트남 다낭 등을 언급하며 남편과의 연락 관련 다툼이나 졸업여행 관련 추억을 회상합니다.
-또한 여행 중 발생하는 위험에 대한 우려도 표하고 있으며, 해외여행 시 언어 장벽의 어려움을 인식하고 영어 실력을 향상시키고 싶다는 마음을 가볍게 표현합니다.
+두 친구가 연애 경험을 공유하며 현재 남자친구와의 관계, 과거 연애 스타일, 연상/연하 연애에 대한 선호도에 대해 가벼운 톤으로 대화하고 있습니다.
     
 아래 사용자 대화에 대해 3문장 내로 요약해주세요:"""
     return prompt

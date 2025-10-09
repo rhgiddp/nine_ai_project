@@ -10,6 +10,8 @@ __pycache__/
 .venv*/
 venv/
 env/
+.conda-*/
+.conda-*/*
 
 # Environment variables / secrets
 .env
@@ -33,5 +35,4 @@ Thumbs.db
 # Selenium temporary Chrome profiles
 yanolja_chrome_profile_*/
 
-.conda-*
-.conda-*/*
+res/

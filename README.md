@@ -133,3 +133,25 @@ conda deactivate
 파일들에서 import 에러가 난 것은 ctrl + shift + P 에서 인터프리터 선택에서 환경을 선택해야 함 
 가끔 껐다 켜야 적용될 때가 있다
 환경 활성 이후에 install 해야 해당 위치에 적용됨.
+설치 위치: D:\FAST_CAMF\Nine_Project_Github\yanolja-summarization\.conda-yanolja\Lib\site-packages
+
+### 키 설정2
+#### MAC
+echo "export OPENAI_API_KEY=''" >> ~/.bashrc   OR   ~/.zshrc
+source ~/.bashrc     OR    ~/.zshrc
+echo $OPENAI_API_KEY
+
+#### WINDOW (bash)
+echo "export OPENAI_API_KEY=''" >> ~/.bashrc
+source ~/.bashrc
+echo $OPENAI_API_KEY
+
+pip install openai
+
+#### key 사용
+from utils import get_openai_client
+OPEN_API_KEY, client = get_openai_client()
+
+
+
+

@@ -3,9 +3,12 @@ tqdm
 gradio==4.36.1
 numpy<2.0
 google-generativeai==0.7.0
-anthropic==0.28.1
+anthropic==0.40.0
 python-dotenv
 torch>=2.5.0
 torchvision>=0.20.0
 torchaudio>=2.5.0
-
+huggingface-hub
+ipywidgets
+jupyterlab-widgets
+guardrails-ai
